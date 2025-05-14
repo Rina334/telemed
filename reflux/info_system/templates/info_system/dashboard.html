@@ -1,0 +1,172 @@
+{% extends 'info_system/base.html' %}
+
+{% block content %}
+
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">Пациенты с пузырно-мочеточниковым рефлюксом</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#addExaminationModal">
+            Добавить осмотр
+        </button>
+    </div>
+</div>
+
+<!-- Статистика -->
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card text-white bg-primary mb-3">
+            <div class="card-body">
+                <h5 class="card-title">{{ patients.count }}</h5>
+                <p class="card-text">Всего пациентов</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-white bg-success mb-3">
+            <div class="card-body">
+                <h5 class="card-title">{{ examinations.count }}</h5>
+                <p class="card-text">Записей осмотров</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-white bg-info mb-3">
+            <div class="card-body">
+                <h5 class="card-title">{{ doctors.count }}</h5>
+                <p class="card-text">Врачей в системе</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Список пациентов -->
+<div class="card">
+    <div class="card-header">
+        <h5>Последние пациенты</h5>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Фото</th>
+                        <th>ФИО</th>
+                        <th>Возраст</th>
+                        <th>Рефлюкс (L/R)</th>
+                        <th>Операция</th>
+                        <th>Пиелонефрит</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for patient in patients %}
+                    <tr>
+                        <td>
+                            {% if patient.photo %}
+                            <img src="{{ patient.photo.url }}" alt="{{ patient.last_name }}" class="rounded-circle" width="40" height="40">
+                            {% else %}
+                            <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                <span class="text-white">{{ patient.first_name|first }}{{ patient.last_name|first }}</span>
+                            </div>
+                            {% endif %}
+                        </td>
+                        <td>
+                      
+                                {{ patient.last_name }} {{ patient.first_name }}
+                        
+                        </td>
+                        <td>{{ patient.age }} лет</td>
+                        <td>
+                            <span class="badge bg-{% if patient.left_kidney_grade > 2 %}danger{% else %}warning{% endif %} reflux-badge" 
+                                  data-bs-toggle="tooltip" title="Левая почка">
+                                {{ patient.get_left_kidney_grade_display }}
+                            </span>
+                            <span class="badge bg-{% if patient.right_kidney_grade > 2 %}danger{% else %}warning{% endif %} reflux-badge" 
+                                  data-bs-toggle="tooltip" title="Правая почка">
+                                {{ patient.get_right_kidney_grade_display }}
+                            </span>
+                        </td>
+                        <td>
+                            {% if patient.operation_type != 'NONE' %}
+                            <span class="badge bg-info text-dark">
+                                {{ patient.get_operation_type_display }}
+                                {% if patient.operation_date %}
+                                ({{ patient.operation_date|date:"d.m.Y" }})
+                                {% endif %}
+                            </span>
+                            {% else %}
+                            <span class="badge bg-secondary">Нет</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if patient.pyelonephritis_history %}
+                            <span class="badge bg-danger">Да</span>
+                            {% if patient.last_pyelonephritis_date %}
+                            ({{ patient.last_pyelonephritis_date|date:"d.m.Y" }})
+                            {% endif %}
+                            {% else %}
+                            <span class="badge bg-success">Нет</span>
+                            {% endif %}
+                        </td>
+
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Последние осмотры -->
+<div class="card mt-4">
+    <div class="card-header">
+        <h5>Последние осмотры</h5>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Дата</th>
+                        <th>Пациент</th>
+                        <th>Врач</th>
+                        <th>Рефлюкс (L/R)</th>
+                        <th>Пиелонефрит</th>
+                        <th>Креатинин</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for exam in examinations|slice:":10" %}
+                    <tr>
+                        <td>{{ exam.examination_date|date:"d.m.Y" }}</td>
+                        <td>{{ exam.patient.last_name }} {{ exam.patient.first_name }}</td>
+                        <td>{{ exam.doctor.last_name }} {{ exam.doctor.first_name|first }}.</td>
+                        <td>
+                            <span class="badge bg-{% if exam.left_kidney_grade > 2 %}danger{% else %}warning{% endif %} reflux-badge">
+                                {{ exam.get_left_kidney_grade_display }}
+                            </span>
+                            <span class="badge bg-{% if exam.right_kidney_grade > 2 %}danger{% else %}warning{% endif %} reflux-badge">
+                                {{ exam.get_right_kidney_grade_display }}
+                            </span>
+                        </td>
+                        <td>
+                            {% if exam.has_pyelonephritis %}
+                            <span class="badge bg-danger">Да</span>
+                            {% else %}
+                            <span class="badge bg-success">Нет</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if exam.creatinine_level %}
+                            {{ exam.creatinine_level }} мг/дл
+                            {% else %}
+                            —
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

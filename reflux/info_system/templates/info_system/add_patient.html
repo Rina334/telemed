@@ -1,0 +1,110 @@
+<div class="modal fade" id="addPatientModal" tabindex="-1" aria-labelledby="addPatientModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addPatientModalLabel">Добавить нового пациента</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="post" action="{% url 'add_patient' %}" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="id_first_name" class="form-label">Имя</label>
+                                <input type="text" class="form-control" id="id_first_name" name="first_name" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="id_last_name" class="form-label">Фамилия</label>
+                                <input type="text" class="form-control" id="id_last_name" name="last_name" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="id_birth_date" class="form-label">Дата рождения</label>
+                                <input type="date" class="form-control" id="id_birth_date" name="birth_date" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="id_doctor" class="form-label">Лечащий врач</label>
+                                <select class="form-select" id="id_doctor" name="doctor">
+                                    <option value="">-- Выберите врача --</option>
+                                    {% for doctor in doctors %}
+                                    <option value="{{ doctor.id }}">{{ doctor.last_name }} {{ doctor.first_name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="id_left_kidney_grade" class="form-label">Степень рефлюкса (левая почка)</label>
+                                <select class="form-select" id="id_left_kidney_grade" name="left_kidney_grade" required>
+                                    {% for value, label in Patient.REFLUX_GRADE_CHOICES %}
+                                    <option value="{{ value }}">{{ label }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="id_right_kidney_grade" class="form-label">Степень рефлюкса (правая почка)</label>
+                                <select class="form-select" id="id_right_kidney_grade" name="right_kidney_grade" required>
+                                    {% for value, label in Patient.REFLUX_GRADE_CHOICES %}
+                                    <option value="{{ value }}">{{ label }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="id_operation_type" class="form-label">Тип операции</label>
+                                <select class="form-select" id="id_operation_type" name="operation_type">
+                                    {% for value, label in Patient.OPERATION_TYPE_CHOICES %}
+                                    <option value="{{ value }}">{{ label }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="id_operation_date" class="form-label">Дата операции</label>
+                                <input type="date" class="form-control" id="id_operation_date" name="operation_date">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="id_photo" class="form-label">Фото пациента</label>
+                        <input class="form-control" type="file" id="id_photo" name="photo" accept="image/*">
+                    </div>
+                    
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="id_pyelonephritis_history" name="pyelonephritis_history">
+                        <label class="form-check-label" for="id_pyelonephritis_history">Наличие пиелонефрита в анамнезе</label>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="id_notes" class="form-label">Дополнительные заметки</label>
+                        <textarea class="form-control" id="id_notes" name="notes" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                    <button type="submit" class="btn btn-primary">Сохранить пациента</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
